@@ -2,40 +2,40 @@ package main
 
 import (
 	"fmt"
-	"io/fs"
 	"os"
 	"path/filepath"
 	"strings"
 )
 
+var (
+	fileMatched []string
+)
+
 // Todo
 // Complete after learning Go Os and Fs methods.
 
-var (
-	fileMatches []string
-)
+func fileSearch(root, token string)  {
+	cwd, err := os.ReadDir(root)
+	if err != nil {
+		fmt.Errorf("Unable to open directory - %v", root)
+	}
 
-func searchFile(searchDir, token string) {
-	fmt.Println("Started!!!")
-	cwd := os.DirFS(searchDir)
-	fmt.Print(cwd.Open("var"))
-	listOfFiles, _ := fs.ReadDir(cwd, "/")
-
-	for _, files := range listOfFiles {
+	for _, files := range cwd {
 		if strings.Contains(files.Name(), token) {
-			fileMatches = append(fileMatches, filepath.Join(searchDir, files.Name()))
+			fileMatched = append(fileMatched, filepath.Join(root, files.Name()))
 		}
 
 		if files.IsDir() {
-			searchFile(files.Name(), token)
+			fileSearch(files.Name(), token)
 		}
 	}
 }
 
 func main() {
-	searchFile("/", "go")
-	for _, v := range fileMatches {
-		fmt.Printf("Found : %s", v)
+	fileSearch("/", "Goboids")
+
+	for _, v := range fileMatched {
+		fmt.Println(v)
 	}
 
 }
